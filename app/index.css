@@ -2,26 +2,19 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
         Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
 }
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
 }
 
 ul {
+    list-style: none;
     padding: 0;
 }
 
 li {
     list-style-type: none;
-}
-
-.avatar {
-    width: 150px;
-    border-radius: 50%;
-}
-
-.space-list-items {
-    margin-bottom: 7px;
 }
 
 .languages {
@@ -35,18 +28,27 @@ li {
     cursor: pointer;
 }
 
-.popular-list {
+popular-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
 }
 
-.popular-item {
-    margin: 20px;
+popular-item {
+    margin: 20;
     text-align: center;
 }
 
-.popular-rank {
+popular-rank {
     font-size: 20px;
     margin: 10px;
+}
+
+space-list-item {
+    margin-bottom: 7px;
+}
+
+avatar {
+    width: 150px;
+    border-radius: 50%;
 }
