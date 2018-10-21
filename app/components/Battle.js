@@ -1,6 +1,32 @@
 const React = require('react');
-const Link = require('react-router-dom');
+const Link = require('react-router-dom').Link;
 const PropTypes = require('prop-types');
+
+function PlayerPreview(props) {
+    return (
+        <div className="column">
+            <img
+                className="avatar"
+                srcSet={props.playerImg}
+                alt={props.name + ' avatar'}
+            />
+            <h2 className="username">@{props.playerName}</h2>
+            <button
+                className="reset"
+                onClick={props.onReset.bind(null, props.id)}
+            >
+                reset
+            </button>
+        </div>
+    );
+}
+
+PlayerPreview.propTypes = {
+    id: PropTypes.string.isRequired,
+    playerImg: PropTypes.string.isRequired,
+    playerName: PropTypes.string.isRequired,
+    onReset: PropTypes.func.isRequired
+};
 
 class Player extends React.Component {
     constructor(props) {
@@ -67,6 +93,7 @@ class Battle extends React.Component {
         };
 
         this.submitPlayer = this.submitPlayer.bind(this);
+        this.resetPlayer = this.resetPlayer.bind(this);
     }
 
     submitPlayer(id, username) {
@@ -74,25 +101,57 @@ class Battle extends React.Component {
             const newState = {};
             newState[id + 'Name'] = username;
             newState[id + 'Img'] =
-                'http://github.com/' + username + '.pgn/?size=200';
+                'https://github.com/' + username + '.png?size=200';
             return newState;
         });
     }
 
+    resetPlayer(id) {
+        this.setState(function() {
+            const newState = {};
+            newState[id + 'Name'] = '';
+            newState[id + 'Img'] = null;
+            return newState;
+        });
+    }
+
+    playerRender(playerId, playerName, playerImg) {
+        if (!playerName) {
+            return (
+                <Player
+                    id={playerId}
+                    label="Player One"
+                    onSubmit={this.submitPlayer}
+                />
+            );
+        } else {
+            return (
+                <PlayerPreview
+                    id={playerId}
+                    playerImg={playerImg}
+                    playerName={playerName}
+                    onReset={this.resetPlayer}
+                />
+            );
+        }
+    }
+
     render() {
+        console.log(process.env.githubID);
         const playerOneName = this.state.playerOneName;
         const playerTwoName = this.state.playerTwoName;
+        const playerOneImg = this.state.playerOneImg;
+        const playerTwoImg = this.state.playerTwoImg;
+        const match = this.props.match;
 
         return (
             <div>
                 <h1>Battle Component</h1>
                 <div className="row">
-                    {!playerOneName && (
-                        <Player
-                            id="playerOne"
-                            label="Player One"
-                            onSubmit={this.submitPlayer}
-                        />
+                    {this.playerRender(
+                        'playerOne',
+                        playerOneName,
+                        playerOneImg
                     )}
 
                     {!playerTwoName && (
@@ -102,7 +161,31 @@ class Battle extends React.Component {
                             onSubmit={this.submitPlayer}
                         />
                     )}
+                    {playerTwoName && (
+                        <PlayerPreview
+                            id="playerTwo"
+                            playerImg={playerTwoImg}
+                            playerName={playerTwoName}
+                            onReset={this.resetPlayer}
+                        />
+                    )}
                 </div>
+                {playerOneName &&
+                    playerTwoName && (
+                        <Link
+                            className="button"
+                            to={{
+                                pathname: match.url + '/results',
+                                search:
+                                    '?playerOneName:' +
+                                    playerOneName +
+                                    '&playerTwoName' +
+                                    playerTwoName
+                            }}
+                        >
+                            Battle
+                        </Link>
+                    )}
             </div>
         );
     }

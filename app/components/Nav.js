@@ -10,12 +10,12 @@ function navigation() {
                 </NavLink>
             </li>
             <li>
-                <NavLink activeClassName="active" to="/Battle">
+                <NavLink activeClassName="active" to="/battle">
                     Battle
                 </NavLink>
             </li>
             <li>
-                <NavLink activeClassName="active" to="/Popular">
+                <NavLink activeClassName="active" to="/popular">
                     Popular
                 </NavLink>
             </li>
