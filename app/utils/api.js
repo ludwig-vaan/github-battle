@@ -1,8 +1,9 @@
+require('dotenv').config();
 const axios = require('axios');
 
-var githubID = '33487210';
-var sec = '3bba8c661dffc99771352be9ca5153429b429d14';
-const params = '?client_id=' + githubID + '&client_secret=' + sec;
+var githubID = process.env.GITHUB_ID;
+var token = process.env.GITHUB_API;
+const params = '?client_id=' + githubID + '&client_secret=' + token;
 
 function getProfile(username) {
     return axios
