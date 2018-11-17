@@ -1,5 +1,5 @@
-const React = require('react');
-const PropTypes = require('prop-types');
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const style = {
     content: {
@@ -7,7 +7,7 @@ const style = {
         fontSize: '35px'
     }
 };
-class Loading extends React.Component {
+export default class Loading extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -49,5 +49,3 @@ Loading.propTypes = {
     text: PropTypes.string.isRequired,
     speed: PropTypes.number.isRequired
 };
-
-module.exports = Loading;

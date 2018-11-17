@@ -1,7 +1,7 @@
-const React = require('react');
-const Link = require('react-router-dom').Link;
-const PropTypes = require('prop-types');
-const PlayerPreview = require('./PlayerPreview');
+import React from 'react';
+import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import PlayerPreview from './PlayerPreview';
 
 class Player extends React.Component {
     constructor(props) {
@@ -15,7 +15,6 @@ class Player extends React.Component {
 
     handleUsername(event) {
         const username = event.target.value;
-        console.log(username);
         this.setState(() => ({
             username
         }));
@@ -58,7 +57,7 @@ Player.propTypes = {
     onSubmit: PropTypes.func.isRequired
 };
 
-class Battle extends React.Component {
+export default class Battle extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -170,5 +169,3 @@ class Battle extends React.Component {
         );
     }
 }
-
-module.exports = Battle;
