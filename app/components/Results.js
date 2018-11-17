@@ -66,26 +66,25 @@ export default class Results extends React.Component {
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         const { location } = this.props;
         const { playerOneName, playerTwoName } = queryString.parse(
             location.search
         );
 
-        battle([playerOneName, playerTwoName]).then(([winner, loser]) =>
-            (winner && loser) === null
-                ? this.setState({
-                      error:
-                          'There is an error. Check that both users if exist on GitHub !',
-                      loading: false
-                  })
-                : this.setState({
-                      error: null,
-                      loading: false,
-                      winner: winner,
-                      loser: loser
-                  })
-        );
+        const [winner, loser] = await battle([playerOneName, playerTwoName]);
+        (winner && loser) === null
+            ? this.setState({
+                  error:
+                      'There is an error. Check that both users if exist on GitHub !',
+                  loading: false
+              })
+            : this.setState({
+                  error: null,
+                  loading: false,
+                  winner: winner,
+                  loser: loser
+              });
     }
 
     render() {
