@@ -16,24 +16,18 @@ class Loading extends React.Component {
     }
 
     componentDidMount() {
-        const stopper = this.props.text + '...';
-        this.interval = window.setInterval(
-            function() {
-                if (this.state.text === stopper) {
-                    this.setState(function() {
-                        return {
-                            text: this.props.text
-                        };
-                    });
-                }
-                this.setState(function(prevState) {
-                    return {
-                        text: prevState.text + '.'
-                    };
-                });
-            }.bind(this),
-            this.props.speed
-        );
+        const { text, speed } = this.props;
+        const stopper = `${text}...`;
+        this.interval = window.setInterval(() => {
+            const { text: currentText } = this.state;
+            currentText === stopper
+                ? this.setState(() => ({
+                      text: this.props.text
+                  }))
+                : this.setState(prevState => ({
+                      text: prevState.text + '.'
+                  }));
+        }, speed);
     }
 
     componentWillUnmount() {
@@ -41,7 +35,8 @@ class Loading extends React.Component {
     }
 
     render() {
-        return <p style={style.content}>{this.state.text}</p>;
+        const { text } = this.state;
+        return <p style={style.content}>{text}</p>;
     }
 }
 
