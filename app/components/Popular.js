@@ -49,28 +49,22 @@ const ReposGrid = ({ repos }) => (
 );
 
 export default class Popular extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            activeLanguage: 'all',
-            repos: null
-        };
-
-        this.currentLanguage = this.currentLanguage.bind(this);
-    }
-
+    state = {
+        activeLanguage: 'all',
+        repos: null
+    };
     componentDidMount() {
         this.currentLanguage(this.state.activeLanguage);
     }
 
-    currentLanguage(language) {
+    currentLanguage = language => {
         this.setState({
             activeLanguage: language,
             repos: null
         });
 
         fetchPopularRepos(language).then(repos => this.setState({ repos }));
-    }
+    };
 
     render() {
         const { activeLanguage, repos } = this.state;

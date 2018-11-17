@@ -4,26 +4,30 @@ import PropTypes from 'prop-types';
 import PlayerPreview from './PlayerPreview';
 
 class Player extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: ''
-        };
-        this.handleUsername = this.handleUsername.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        onSubmit: PropTypes.func.isRequired
+    };
 
-    handleUsername(event) {
+    static defaultProps = {
+        label: 'username'
+    };
+    state = {
+        username: ''
+    };
+
+    handleUsername = event => {
         const username = event.target.value;
         this.setState(() => ({
             username
         }));
-    }
+    };
 
-    handleSubmit(event) {
+    handleSubmit = event => {
         event.preventDefault();
         this.props.onSubmit(this.props.id, this.state.username);
-    }
+    };
     render() {
         const { id, label } = this.props;
         const { username } = this.state;
@@ -50,40 +54,25 @@ class Player extends React.Component {
         );
     }
 }
-
-Player.propTypes = {
-    id: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    onSubmit: PropTypes.func.isRequired
-};
-
 export default class Battle extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            playerOneName: '',
-            playerOneImg: null,
-            playerTwoName: '',
-            playerTwoImg: null
-        };
+    state = {
+        playerOneName: '',
+        playerOneImg: null,
+        playerTwoName: '',
+        playerTwoImg: null
+    };
 
-        this.submitPlayer = this.submitPlayer.bind(this);
-        this.resetPlayer = this.resetPlayer.bind(this);
-    }
-
-    submitPlayer(id, username) {
+    submitPlayer = (id, username) =>
         this.setState(() => ({
             [id + 'Name']: username,
             [id + 'Img']: `https://github.com/${username}.png?size=200`
         }));
-    }
 
-    resetPlayer(id) {
+    resetPlayer = id =>
         this.setState(() => ({
             [id + 'Name']: '',
             [id + 'Img']: null
         }));
-    }
 
     playerRender(playerId, playerName, playerImg) {
         if (!playerName) {
