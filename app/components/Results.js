@@ -71,20 +71,20 @@ export default class Results extends React.Component {
         const { playerOneName, playerTwoName } = queryString.parse(
             location.search
         );
-        battleResults = battle([playerOneName, playerTwoName]).then(
-            ([winner, loser]) =>
-                (winner && loser) === null
-                    ? this.setState({
-                          error:
-                              'There is an error. Check that both users if exist on GitHub !',
-                          loading: false
-                      })
-                    : this.setState({
-                          error: null,
-                          loading: false,
-                          winner: winner,
-                          loser: loser
-                      })
+
+        battle([playerOneName, playerTwoName]).then(([winner, loser]) =>
+            (winner && loser) === null
+                ? this.setState({
+                      error:
+                          'There is an error. Check that both users if exist on GitHub !',
+                      loading: false
+                  })
+                : this.setState({
+                      error: null,
+                      loading: false,
+                      winner: winner,
+                      loser: loser
+                  })
         );
     }
 
