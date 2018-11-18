@@ -1,45 +1,53 @@
-const api = require('../utils/api');
-const Link = require('react-router-dom').Link;
-const PlayerPreview = require('./PlayerPreview');
-const PropTypes = require('prop-types');
-const queryString = require('query-string');
-const React = require('react');
-const Loading = require('./Loading');
+import { battle } from '../utils/api';
+import { Link } from 'react-router-dom';
+import PlayerPreview from './PlayerPreview';
+import PropTypes from 'prop-types';
+import queryString from 'query-string';
+import React from 'react';
+import Loading from './Loading';
 
-function Profile(props) {
-    const info = props.info;
+const Profile = ({ info }) => {
+    const {
+        avatar_url,
+        login,
+        name,
+        location,
+        company,
+        followers,
+        following,
+        public_repos,
+        blog
+    } = info;
     return (
-        <PlayerPreview playerImg={info.avatar_url} playerName={info.login}>
+        <PlayerPreview playerImg={avatar_url} playerName={login}>
             <ul className="space-list-items">
-                {info.name && <li>{info.name}</li>}
-                {info.location && <li>{info.location}</li>}
-                {info.company && <li>{info.company}</li>}
-                <li>Followers: {info.followers}</li>
-                <li>Following: {info.following}</li>
-                <li>Public Repos: {info.public_repos}</li>
-                {info.blog && (
+                {name && <li>{name}</li>}
+                {location && <li>{location}</li>}
+                {company && <li>{company}</li>}
+                <li>Followers: {followers}</li>
+                <li>Following: {following}</li>
+                <li>Public Repos: {public_repos}</li>
+                {blog && (
                     <li>
-                        <a href={info.blog}>{info.blog}</a>
+                        <a href={blog}>{blog}</a>
                     </li>
                 )}
             </ul>
         </PlayerPreview>
     );
-}
+};
 
 Profile.propTypes = {
     info: PropTypes.object.isRequired
 };
 
-function Player(props) {
-    return (
-        <div>
-            <h1 className="header">{props.label}</h1>
-            <h3 style={{ textAlign: 'center' }}>Score: {props.score}</h3>
-            <Profile info={props.profile} />
-        </div>
-    );
-}
+const Player = ({ label, score, profile }) => (
+    <div>
+        <h1 className="header">{label}</h1>
+        <h3 style={{ textAlign: 'center' }}>Score: {score}</h3>
+        <Profile info={profile} />
+    </div>
+);
 
 Player.propTypes = {
     label: PropTypes.string.isRequired,
@@ -47,7 +55,7 @@ Player.propTypes = {
     profile: PropTypes.object.isRequired
 };
 
-class Results extends React.Component {
+export default class Results extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -58,39 +66,29 @@ class Results extends React.Component {
         };
     }
 
-    componentDidMount() {
-        const players = queryString.parse(this.props.location.search);
-        battleResults = api
-            .battle([players.playerOneName, players.playerTwoName])
-            .then(
-                function(results) {
-                    if (results === null) {
-                        this.setState(function() {
-                            return {
-                                error:
-                                    'There is an error. Check that both users if exist on GitHub ! ',
-                                loading: false
-                            };
-                        });
-                    } else {
-                        this.setState(function() {
-                            return {
-                                error: null,
-                                loading: false,
-                                winner: results[0],
-                                loser: results[1]
-                            };
-                        });
-                    }
-                }.bind(this)
-            );
+    async componentDidMount() {
+        const { location } = this.props;
+        const { playerOneName, playerTwoName } = queryString.parse(
+            location.search
+        );
+
+        const [winner, loser] = await battle([playerOneName, playerTwoName]);
+        (winner && loser) === null
+            ? this.setState({
+                  error:
+                      'There is an error. Check that both users if exist on GitHub !',
+                  loading: false
+              })
+            : this.setState({
+                  error: null,
+                  loading: false,
+                  winner: winner,
+                  loser: loser
+              });
     }
 
     render() {
-        const loser = this.state.loser;
-        const winner = this.state.winner;
-        const error = this.state.error;
-        const loading = this.state.loading;
+        const { loser, winner, error, loading } = this.state;
 
         if (loading === true) {
             return <Loading />;
@@ -123,5 +121,3 @@ class Results extends React.Component {
         );
     }
 }
-
-module.exports = Results;

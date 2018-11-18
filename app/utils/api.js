@@ -1,82 +1,61 @@
 require('dotenv').config();
-const axios = require('axios');
 
-var githubID = process.env.CLIENT_ID;
-var token = process.env.CLIENT_SECRET;
-const params = '?client_id=' + githubID + '&client_secret=' + token;
+const githubID = process.env.CLIENT_ID;
+const token = process.env.CLIENT_SECRET;
+const params = `?client_id=${githubID}&client_secret=${token}`;
 
-function getProfile(username) {
-    return axios
-        .get('https://api.github.com/users/' + username + params)
-        .then(function(user) {
-            return user.data;
-        });
-}
-
-function getRepos(username) {
-    return axios.get(
-        'https://api.github.com/users/' +
-            username +
-            '/repos' +
-            params +
-            '&per_page=100'
+const getProfile = async username => {
+    const data = await fetch(
+        `https://api.github.com/users/${username}${params}`
     );
-}
 
-function getStarCount(repos) {
-    return repos.data.reduce(function(count, repo) {
-        return count + repo.stargazers_count;
-    }, 0);
-}
+    return data.json();
+};
+const getRepos = async username => {
+    const response = await fetch(
+        `https://api.github.com/users/${username}/repos${params}&per_page=100`
+    );
 
-function calculateScore(profile, repos) {
-    var followers = profile.followers;
-    var totalStars = getStarCount(repos);
+    return response.json();
+};
 
-    return followers * 3 + totalStars;
-}
+const getStarCount = repos =>
+    repos.reduce((count, { stargazers_count }) => count + stargazers_count, 0);
 
-function handleError(error) {
+const calculateScore = ({ followers }, repos) =>
+    followers * 3 + getStarCount(repos);
+
+const handleError = error => {
     console.warn(error);
+
     return null;
-}
+};
 
-function getUserData(player) {
-    return axios
-        .all([getProfile(player), getRepos(player)])
-        .then(function(data) {
-            var profile = data[0];
-            var repos = data[1];
+const getUserData = async player => {
+    const [profile, repos] = await Promise.all([
+        getProfile(player),
+        getRepos(player)
+    ]);
 
-            return {
-                profile: profile,
-                score: calculateScore(profile, repos)
-            };
-        });
-}
+    return { profile, score: calculateScore(profile, repos) };
+};
 
-function sortPlayers(players) {
-    return players.sort(function(a, b) {
-        return b.score - a.score;
-    });
-}
+const sortPlayers = players => players.sort((a, b) => b.score - a.score);
 
-module.exports = {
-    battle: function(players) {
-        return axios
-            .all(players.map(getUserData))
-            .then(sortPlayers)
-            .catch(handleError);
-    },
-    fetchPopularRepos: function(language) {
-        var encodedURI = window.encodeURI(
-            'https://api.github.com/search/repositories?q=stars:>1+language:' +
-                language +
-                '&sort=stars&order=desc&type=Repositories'
-        );
+export const battle = async players => {
+    const results = await Promise.all(players.map(getUserData)).catch(
+        handleError
+    );
 
-        return axios.get(encodedURI).then(function(response) {
-            return response.data.items;
-        });
-    }
+    return results === null ? results : sortPlayers(results);
+};
+
+export const fetchPopularRepos = async language => {
+    const encodedURI = window.encodeURI(
+        `https://api.github.com/search/repositories?q=stars:>1+language:${language}&sort=stars&order=desc&type=Repositories`
+    );
+    const data = await fetch(encodedURI).catch(handleError);
+    const { items } = await data.json();
+
+    return items;
 };
